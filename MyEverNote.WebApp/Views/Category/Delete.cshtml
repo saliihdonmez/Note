@@ -1,0 +1,80 @@
+﻿@model MyEverNote.Entities.Category
+
+@{
+    ViewBag.Title = "Delete";
+}
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <h2>Delete</h2>
+        <hr />
+        <h3>Are you sure you want to delete this?</h3>
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div>
+            <h4>Delete Category</h4>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Title)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Title)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreateOn)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.CreateOn)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Modifiedon)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Modifiedon)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ModifiedUsername)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ModifiedUsername)
+                </dd>
+
+            </dl>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+            <div class="form-actions no-color">
+                @MyBootstrap.Button("danger", string.Empty, "submit", "trash", " Delete")
+
+                @MyBootstrap.LinkButton("/Category/Index/","warning",string.Empty, string.Empty,
+                "backward", " Back To List")
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+

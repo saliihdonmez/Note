@@ -1,0 +1,110 @@
+﻿@using MyEverNote.Entities
+@model EvernoteUser
+@{
+    ViewBag.Title = "Profili Düzenle";
+}
+
+<div class="container">
+    <div class="row">
+        <h2>@ViewBag.Title</h2>
+    </div>
+
+    <hr />
+    <br />
+
+    <div class="row">
+        @using (Html.BeginForm("EditProfile","Home",FormMethod.Post, new {enctype="multipart/form-data" }))
+        {
+            <div class="col-md-6">
+                <img src="~/Images/@Model.ProfileImageFilename" class="img-circle" width="128" height="128" />
+                <br /><br />
+               <form>
+                <div class="form-group">               
+                    <input type="file" name="ProfileImage" class="form-control-file" id="exampleFormControlFile1">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span><i>Lütfen jpg,jpeg ya da png formatı kullanın</i></span>
+                </div>
+                </form>
+                <br />
+
+            </div>
+
+            <div class="col-md-6">
+                @Html.ValidationSummary(false)
+                @Html.HiddenFor(model => model.Id)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col -md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Surname, htmlAttributes: new { @class = "control-label col -md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Surname, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Username, htmlAttributes: new { @class = "control-label col -md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Paswword, htmlAttributes: new { @class = "control-label col -md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Paswword, new { htmlAttributes = new { @class = "form-control", type = "password" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col -md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Kaydet" class="btn btn-success" />
+                        @Html.ActionLink("İptal", "ShowProfile", "Home", null, new { @class = "btn btn-danger" })
+                    </div>
+                </div>
+
+            </div>
+ 
+            
+        }
+       
+</div>
+
+<script>
+
+
+    jQuery('.dropdown-toggle').on('click', function (e) {
+        $(this).next().toggle();
+    });
+    jQuery('.dropdown-menu.keep-open').on('click', function (e) {
+        e.stopPropagation();
+    });
+
+    if (1) {
+        $('body').attr('tabindex', '0');
+    }
+    else {
+        alertify.confirm().set({ 'reverseButtons': true });
+        alertify.prompt().set({ 'reverseButtons': true });
+    }
+
+    $(function () {
+
+        $("footer").hide();
+
+
+    });
+
+</script>

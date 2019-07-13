@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using MyEverNote.Entities
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -17,10 +19,22 @@
     <!-- Bootstrap core JavaScript -->
 </head>
 <body>
+
+    @{ 
+        EvernoteUser user = null;
+
+        if (Session["login"] !=null)
+        {
+            user = Session["login"] as EvernoteUser;
+        }
+
+       }
+
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" role="navigation">
         <div class="container">
-            <a class="navbar-brand" href="#">My Evernote </a>
+            <a class="navbar-brand" href="~/index.html">My Evernote </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -28,46 +42,140 @@
                 <ul class="nav navbar-nav">
                     <li class="nav-item active">
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Home/MostLiked">
-                            <i class="fas fa-thumbs-up"></i>
-                            En Beğenilenler
+                    @if (user != null)
+                    {
+                        <li class="dropdown">
+
+                        <a href="/Note/MyNotes" class="dropdown-toggle nav-item" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-allergies"></i> Yönetim <span class="caret"></span>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Home/Index">
-                            <i class="fas fa-list"></i>
-                            Son Yazılanlar
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Home/About">
-                            <i class="fas fa-info-circle"></i>
-                            Hakkımızda
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/Note/AddNew">
+                                    <i class="fas fa-plus"></i>
+                                    Not Ekle
+                                </a>
+                            </li>
+                            <li role="separator" class="dropdown-divider"></li>
+                            <li>
+                                <a href="/Note/MyNotes">
+                                    <i class="fas fa-money-check"></i>
+                                    Notlarım
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/Note/MyLikedNotes">
+                                    <i class="fas fa-heart"></i>>
+                                    Beğendiklerim
+                                </a>
+                            </li>
+                            <li role="separator" class="dropdown-divider"></li>
+
+                            @if (user.IsAdmin)
+                            {
+                                <li>
+                                    <a href="/Category/Create">
+                                        <i class="fas fa-plus"></i>
+                                        Kategori Ekle
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="/Category/Index">
+                                        <i class="fas fa-list"></i>
+                                        Kategoriler
+                                    </a>
+                                </li>
+
+                                <li role="separator" class="dropdown-divider"></li>
+                                <li>
+                                    <a href="/EvernoteUser/Create">
+                                        <i class="fas fa-plus"></i>
+                                        Kullanıcı Ekle
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/EvernoteUser/Index">
+                                        <i class="fas fa-list"></i>
+                                        Kullanıcılar
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                            </li>
+
+                        }
 
 
-                        </a>
-                    </li>
-                </ul>
-
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Home/Login">
-
-                            <i class="fas fa-user"></i>
-                            Giriş
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Home/Register">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Kayıt Ol
-                        </a>
-                    </li>
-                </ul>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home/MostLiked">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    En Beğenilenler
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home/Index">
+                                    <i class="fas fa-list"></i>
+                                    Son Yazılanlar
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home/About">
+                                    <i class="fas fa-info-circle"></i>
+                                    Hakkımızda
 
 
-            </div>
+                                </a>
+                            </li>
+                        </ul>
+
+                            <ul class="navbar-nav ml-auto">
+                                @if (user == null)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/Home/Login">
+
+                                            <i class="fas fa-user"></i>
+                                            Giriş
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/Home/Register">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                            Kayıt Ol
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                <li class="dropdown">
+                                    <a href="/Home/ShowProfile" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-user"></i>@user.Username
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/Home/ShowProfile">  <i class="fas fa-user"></i> Profili Göster</a></li>
+                                        <li><a href="/Home/EditProfile">  <i class="fas fa-edit"></i> Profili Düzenle</a></li>
+                                        <li><a href="/Home/DeleteProfile" onclick="return confirm('Hesabınızı silmek istediğinizden emin misiniz');">
+                                       <i class="fas fa-trash"></i> Profili Sil</a></li>
+                                    </ul>
+
+                                </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/Home/Logout">
+
+                                            <i class="fas fa-log-out"></i>
+                                            Çıkış
+                                        </a>
+                                    </li>
+
+                                }
+                            </ul>
+
+
+</div>
         </div>
     </nav>
 
@@ -75,16 +183,7 @@
     @RenderBody()
     <!-- /.container -->
     <!-- Footer -->
-
-
-
-    <footer class="py-5 bg-dark">
-        <div class="container">
-            <p class="m-0 text-center text-white">Copyright &copy; Your Website 2019</p>
-        </div>
-        <!-- /.container -->
-    </footer>
-
+    @RenderSection("footer",required:false)
 
 </body>
 </html>

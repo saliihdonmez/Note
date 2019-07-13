@@ -8,26 +8,26 @@ namespace MyEvernote.DataAccessLayer.Entity
 {
   public  class RepositoryBase
     {
-        protected static DatabaseContext db;
+        protected static DatabaseContext context;
         private static object _lock = new object();
 
         protected RepositoryBase()
         {
-            db = CreateContext();
+            context = CreateContext();
         }
         private static DatabaseContext CreateContext()
         {
-            if (db == null)
+            if (context == null)
             {
                 lock (_lock)
                 {
-                    if (db == null)
+                    if (context == null)
                     {
-                        db = new DatabaseContext();
+                        context = new DatabaseContext();
                     }
                 }
             }
-            return db;
+            return context;
         }
     }
 }

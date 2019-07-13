@@ -1,7 +1,11 @@
 ﻿using MyEvernote.BusinessLayer;
+using MyEvernote.BusinessLayer.Results;
 using MyEverNote.Entities;
 using MyEverNote.Entities.Messages;
 using MyEverNote.Entities.ValueObjects;
+using MyEverNote.WebApp.Filters;
+using MyEverNote.WebApp.Models;
+using MyEverNote.WebApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,22 +16,34 @@ using System.Web.Mvc;
 
 namespace MyEverNote.WebApp.Controllers
 {
+    [Exc]
     public class HomeController : Controller
     {
+        private NoteManager noteManager = new NoteManager();
+        private CategoryManager categoryManager = new CategoryManager();
+        private EvernoteUserManager evernoteUserManager = new EvernoteUserManager();
+
         // GET: Home
         public ActionResult Index()
         {
+            //object o = 0;
+            //int a = 1;
+            //int c = a / (int)o;
 
-            //  Categoryler üzerinden gelen view talebi ve model..
-            //    if (TempData["mm"]!=null)
-            //    {
-            //        return View(TempData["mm"] as List<Note>);
-            //    }
+            //throw new Exception("Herhangi bir hata oluştu.");
 
-            NoteManager nm = new NoteManager();
-            return View(nm.GetAllNote().OrderByDescending(x => x.Modifiedon).ToList());
-            // return View(nm.GetAllNoteQueryable().OrderByDescending(x => x.Modifiedon).ToList());
 
+
+            // CategoyController üzerinden gelen view talebi ve model..
+            //
+            //if (TempData["mm"] != null)
+            //{
+            //    return View(TempData["mm"] as List<Note>);
+            //}
+
+
+            return View(noteManager.ListQueryable().Where(x => x.IsDraft == false).OrderByDescending(x => x.ModifiedOn).ToList());
+            //return View(nm.GetAllNoteQueryable().OrderByDescending(x => x.ModifiedOn).ToList());
         }
 
         public ActionResult ByCategory(int? id)
@@ -37,26 +53,27 @@ namespace MyEverNote.WebApp.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            CategoryManager cm = new CategoryManager();
-            Category cat = cm.GetCategoryById(id.Value);
+            //Category cat = categoryManager.Find(x => x.Id == id.Value);
 
+            //if (cat == null)
+            //{
+            //    return HttpNotFound();
+            //    //return RedirectToAction("Index", "Home");
+            //}
 
-            if (cat == null)
-            {
-                return HttpNotFound();
-                // return RedirectToAction("Index", "Home");
-            }
+            //List<Note> notes = cat.Notes.Where(
+            //    x => x.IsDraft == false).OrderByDescending(x => x.ModifiedOn).ToList()
 
-            return View("Index", cat.Notes.OrderByDescending(x => x.Modifiedon).ToList());
+            List<Note> notes = noteManager.ListQueryable().Where(
+                x => x.IsDraft == false && x.CategoryId == id).OrderByDescending(
+                x => x.ModifiedOn).ToList();
 
+            return View("Index", notes);
         }
 
         public ActionResult MostLiked()
         {
-            NoteManager nm = new NoteManager();
-
-
-            return View("Index", nm.GetAllNote().OrderByDescending(x => x.LikeCount).ToList());
+            return View("Index", noteManager.ListQueryable().OrderByDescending(x => x.LikeCount).ToList());
         }
 
         public ActionResult About()
@@ -64,7 +81,113 @@ namespace MyEverNote.WebApp.Controllers
             return View();
         }
 
-        // GET:
+
+        [Auth]
+        public ActionResult ShowProfile()
+        {
+            BusinessLayerResult<EvernoteUser> res =
+                evernoteUserManager.GetUserById(CurrentSession.User.Id);
+
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Hata Oluştu",
+                    Items = res.Errors
+                };
+
+                return View("Error", errorNotifyObj);
+            }
+
+            return View(res.Result);
+        }
+
+        [Auth]
+        public ActionResult EditProfile()
+        {
+            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.GetUserById(CurrentSession.User.Id);
+
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Hata Oluştu",
+                    Items = res.Errors
+                };
+
+                return View("Error", errorNotifyObj);
+            }
+
+            return View(res.Result);
+        }
+
+        [Auth]
+        [HttpPost]
+        public ActionResult EditProfile(EvernoteUser model, HttpPostedFileBase ProfileImage)
+        {
+            ModelState.Remove("ModifiedUsername");
+
+            if (ModelState.IsValid)
+            {
+                if (ProfileImage != null &&
+                    (ProfileImage.ContentType == "image/jpeg" ||
+                    ProfileImage.ContentType == "image/jpg" ||
+                    ProfileImage.ContentType == "image/png"))
+                {
+                    string filename = $"user_{model.Id}.{ProfileImage.ContentType.Split('/')[1]}";
+
+                    ProfileImage.SaveAs(Server.MapPath($"~/images/{filename}"));
+                    model.ProfileImageFilename = filename;
+                }
+
+                BusinessLayerResult<EvernoteUser> res = evernoteUserManager.UpdateProfile(model);
+
+                if (res.Errors.Count > 0)
+                {
+                    ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                    {
+                        Items = res.Errors,
+                        Title = "Profil Güncellenemedi.",
+                        RedirectingUrl = "/Home/EditProfile"
+                    };
+
+                    return View("Error", errorNotifyObj);
+                }
+
+                // Profil güncellendiği için session güncellendi.
+                CurrentSession.Set<EvernoteUser>("login", res.Result);
+
+                return RedirectToAction("ShowProfile");
+            }
+
+            return View(model);
+        }
+
+        [Auth]
+        public ActionResult DeleteProfile()
+        {
+            BusinessLayerResult<EvernoteUser> res =
+                evernoteUserManager.RemoveUserById(CurrentSession.User.Id);
+
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Items = res.Errors,
+                    Title = "Profil Silinemedi.",
+                    RedirectingUrl = "/Home/ShowProfile"
+                };
+
+                return View("Error", errorNotifyObj);
+            }
+
+            Session.Clear();
+
+            return RedirectToAction("Index");
+        }
+
+
+
         public ActionResult Login()
         {
             return View();
@@ -75,28 +198,31 @@ namespace MyEverNote.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                EvernoteUserManager eum = new EvernoteUserManager();
-                BusinessLayerResult<EvernoteUser> res = eum.LoginUser(model);
+                BusinessLayerResult<EvernoteUser> res = evernoteUserManager.LoginUser(model);
 
                 if (res.Errors.Count > 0)
                 {
-
-                    if (res.Errors.Find(x => x.Code ==ErrorMessageCode.UserIsNotAvtive) != null)
-                    {
-                        ViewBag.SetLink = "E-posta Gönder";
-                    }
+                    // Hata koduna göre özel işlem yapmamız gerekirse..
+                    // Hatta hata mesajına burada müdahale edilebilir.
+                    // (Login.cshtml'deki kısmında açıklama satırı şeklinden kurtarınız)
+                    //
+                    //if (res.Errors.Find(x => x.Code == ErrorMessageCode.UserIsNotActive) != null)
+                    //{
+                    //    ViewBag.SetLink = "http://Home/Activate/1234-4567-78980";
+                    //}
 
                     res.Errors.ForEach(x => ModelState.AddModelError("", x.Message));
+
                     return View(model);
                 }
 
-                Session["login"] = res.Result;  // Session'a kullanıcı bilgi saklama
-                return RedirectToAction("Index"); // Yönlendirme
+                CurrentSession.Set<EvernoteUser>("login", res.Result); // Session'a kullanıcı bilgi saklama..
+                return RedirectToAction("Index");   // yönlendirme..
             }
+
             return View(model);
         }
 
-        // GET: Account
         public ActionResult Register()
         {
             return View();
@@ -105,81 +231,111 @@ namespace MyEverNote.WebApp.Controllers
         [HttpPost]
         public ActionResult Register(RegisterViewModel model)
         {
-
-
             if (ModelState.IsValid)
             {
-                EvernoteUserManager eum = new EvernoteUserManager();
-                BusinessLayerResult<EvernoteUser> res = eum.RegisterUser(model);
-                if (res.Errors.Count>0)
+                BusinessLayerResult<EvernoteUser> res = evernoteUserManager.RegisterUser(model);
+
+                if (res.Errors.Count > 0)
                 {
                     res.Errors.ForEach(x => ModelState.AddModelError("", x.Message));
                     return View(model);
                 }
-                
+
+
                 //EvernoteUser user = null;
-                
+
                 //try
                 //{
-                //    user=eum.RegisterUser(model);
+                //    user = eum.RegisterUser(model);
                 //}
                 //catch (Exception ex)
                 //{
-                //    ModelState.AddModelError("", ex.Message);
-                //    throw;
+                //    ModelState.AddModelError("", ex.Message);   
                 //}
 
 
-                //    bool hasError = false;
-                //    if (model.Username=="aa")
+
+                //if (model.Username == "aaa")
+                //{
+                //    ModelState.AddModelError("", "Kullanıcı adı kullanılıyor.");
+                //}
+
+                //if(model.EMail == "aaa@aa.com")
+                //{
+                //    ModelState.AddModelError("", "E-posta adresi kullanılıyor.");
+                //}
+
+                //foreach (var item in ModelState)
+                //{
+                //    if(item.Value.Errors.Count > 0)
                 //    {
-                //        ModelState.AddModelError("", "Kullanıcı Adı kullanılıyor");
+                //        return View(model);
                 //    }
+                //}
 
-                //    if (model.Email=="aa@aa.com")
-                //    {
-                //        ModelState.AddModelError("", "Email kullanılıyor");
-                //    }
-
-                //    foreach (var item in ModelState)
-                //    {
-                //        if (item.Value.Errors.Count>0)
-                //        {
-                //            return View(model);
-                //        }
-                //    }
-
-
-                //if (user==null)
+                //if (user == null)
                 //{
                 //    return View(model);
                 //}
-                return RedirectToAction("RegisterOk");
+
+                OkViewModel notifyObj = new OkViewModel()
+                {
+                    Title = "Kayıt Başarılı",
+                    RedirectingUrl = "/Home/Login",
+                };
+
+                notifyObj.Items.Add("Lütfen e-posta adresinize gönderdiğimiz aktivasyon link'ine tıklayarak hesabınızı aktive ediniz. Hesabınızı aktive etmeden not ekleyemez ve beğenme yapamazsınız.");
+
+                return View("Ok", notifyObj);
             }
 
             return View(model);
         }
 
-        public ActionResult RegisterOk()
+        public ActionResult UserActivate(Guid id)
         {
+            BusinessLayerResult<EvernoteUser> res = evernoteUserManager.ActivateUser(id);
 
-            return View();
+            if (res.Errors.Count > 0)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Geçersiz İşlem",
+                    Items = res.Errors
+                };
+
+                return View("Error", errorNotifyObj);
+            }
+
+            OkViewModel okNotifyObj = new OkViewModel()
+            {
+                Title = "Hesap Aktifleştirildi",
+                RedirectingUrl = "/Home/Login"
+            };
+
+            okNotifyObj.Items.Add("Hesabınız aktifleştirildi. Artık not paylaşabilir ve beğenme yapabilirsiniz.");
+
+            return View("Ok", okNotifyObj);
         }
+
+
 
         public ActionResult Logout()
         {
             Session.Clear();
-
             return RedirectToAction("Index");
-
         }
 
-        public ActionResult UsserActivate(Guid activate_id)
+
+        public ActionResult AccessDenied()
         {
-
             return View();
-
         }
 
+
+        public ActionResult HasError()
+        {
+            return View();
+        }
     }
- }
+}

@@ -67,7 +67,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract\IRepository.cs" />
     <Compile Include="Entity\DatabaseContext.cs" />
     <Compile Include="Entity\Repository.cs" />
     <Compile Include="Entity\RepositoryBase.cs" />
@@ -88,6 +87,10 @@
     <ProjectReference Include="..\MyEverNote.Entities\MyEverNote.Entities.csproj">
       <Project>{c09dd23b-5c82-48ad-bd3f-abed5cc66d5e}</Project>
       <Name>MyEverNote.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyEvetnote.Core\MyEvernote.Core.csproj">
+      <Project>{94ea7976-847f-46b2-8efe-92b87e01ecd7}</Project>
+      <Name>MyEvernote.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

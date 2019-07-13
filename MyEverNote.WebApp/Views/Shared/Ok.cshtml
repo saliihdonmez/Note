@@ -1,0 +1,42 @@
+﻿@using MyEverNote.WebApp.ViewModels
+@model OkViewModel
+@{
+    ViewBag.Title = Model.Title;
+}
+
+<h2>UserActivateCancel</h2>
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="card-header"><h3>@Model.Header</h3></div>
+        <div class="card-body">
+            <h4 class="card-title"><i class="fas fa-remove"></i> @Model.Title</h4>
+            <p class="card-text">
+                @foreach (string msg in Model.Items)
+                {
+                    @msg <br />
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+@{ 
+    string js = string.Empty;
+    if (Model.IsRedirecting)
+    {
+        js = "setTimeout(function () {window.location ='"+ Model.RedirectingUrl +"' ;},"+
+          Model.RedicectingTimeout+");"  ;
+    }
+}
+
+<script>
+
+            $(function () {
+
+                $("footer").hide();
+                @Html.Raw(js);
+            });
+
+</script>
+

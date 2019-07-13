@@ -68,25 +68,30 @@
                                             devamı
                                             <span><i class="fas fa-chevron-right"></i></span>
                                         </a>
-                                   </p>
+                                    </p>
                                 }
                                 else
                                 {
                                     <p class="card-text">
-                                        @note.Text</p>
-                                        }
+                                        @note.Text
+                                    </p>
+                                }
 
 
                                 </div>
-                            <div class="card-footer">
-                                <small class="text-muted">
-                                    <span type="button" class="btn btn-outline-info btn-sm">@note.LikeCount <i class="fas fa-star"></i></span>
-                                    <span type="button" class="btn btn-outline-info btn-sm "> <i class="fas fa-comments"></i>Yorumlar</span>
-                                </small>
+                                <div class="card-footer">
+                                    <small class="text-muted">
+                                        <span type="button" class="btn btn-outline-info btn-sm">@note.LikeCount <i class="fas fa-star"></i></span>
+                                        <span type="button" class="btn btn-outline-info btn-sm "> <i class="fas fa-comments"></i>Yorumlar</span>
+                                    </small>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                }
+                    }
             </div>
-</div>
+        </div>
+
+        @section footer{
+            @Html.Partial("_PartialFooter")
+        }

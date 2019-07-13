@@ -23,6 +23,7 @@ namespace MyEverNote.Entities
         public virtual List<Comment> Comments { get; set; }
         public virtual  Category Category { get; set; }
         public virtual List<Liked> Likes { get; set; }
+        public object ModifiedOn { get; set; }
 
         public Note()
         {

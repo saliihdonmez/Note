@@ -1,4 +1,4 @@
-﻿using MyEvernote.DataAccessLayer.Abstract;
+﻿using MyEvernote.Core.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyEvernote.DataAccessLayer.MySql
 {
-    class Repostory<T> : RepostoryBase, IRepository<T> where T : class
+    class Repostory<T> : RepostoryBase, IDataAccess<T> where T : class
     {
         public int Delete(T obj)
         {
@@ -45,42 +45,42 @@ namespace MyEvernote.DataAccessLayer.MySql
             throw new NotImplementedException();
         }
 
-        int IRepository<T>.Delete(T obj)
+        int IDataAccess<T>.Delete(T obj)
         {
             throw new NotImplementedException();
         }
 
-        T IRepository<T>.Find(Expression<Func<T, bool>> where)
+        T IDataAccess<T>.Find(Expression<Func<T, bool>> where)
         {
             throw new NotImplementedException();
         }
 
-        int IRepository<T>.Insert(T obj)
+        int IDataAccess<T>.Insert(T obj)
         {
             throw new NotImplementedException();
         }
 
-        List<T> IRepository<T>.List()
+        List<T> IDataAccess<T>.List()
         {
             throw new NotImplementedException();
         }
 
-        List<T> IRepository<T>.List(Expression<Func<T, bool>> where)
+        List<T> IDataAccess<T>.List(Expression<Func<T, bool>> where)
         {
             throw new NotImplementedException();
         }
 
-        IQueryable<T> IRepository<T>.ListQueryable()
+        IQueryable<T> IDataAccess<T>.ListQueryable()
         {
             throw new NotImplementedException();
         }
 
-        int IRepository<T>.Save()
+        int IDataAccess<T>.Save()
         {
             throw new NotImplementedException();
         }
 
-        int IRepository<T>.Update(T obj)
+        int IDataAccess<T>.Update(T obj)
         {
             throw new NotImplementedException();
         }

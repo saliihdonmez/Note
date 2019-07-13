@@ -1,0 +1,43 @@
+﻿@using MyEverNote.Entities.Messages
+@using MyEverNote.WebApp.ViewModels
+@model ErrorViewModel
+@{
+    ViewBag.Title = Model.Title;
+}
+
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="card-header"><h3>@Model.Header</h3></div>
+        <div class="card-body">
+            <h4 class="card-title"><i class="fas fa-remove"></i> @Model.Title</h4>
+            <p class="card-text">
+                @foreach (ErrorMessageObj msg in Model.Items)
+                {
+                    @msg.Message <br />
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+@{
+    string js = string.Empty;
+    if (Model.IsRedirecting)
+    {
+        js = "setTimeout(function () {window.location ='" + Model.RedirectingUrl + "' ;}," +
+          Model.RedicectingTimeout + ");";
+    }
+}
+
+<script>
+
+            $(function () {
+
+                $("footer").hide();
+                @Html.Raw(js);
+            });
+
+</script>
+
+
