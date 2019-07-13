@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "RegisterOk";
+}
+
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="card-header"><h3>Yönlendiriliyorsunuz..</h3></div>
+        <div class="card-body">
+            <h4 class="card-title"><i class="fas fa-check"></i> Kayıt Oldunuz..</h4>
+            <p class="card-text">
+                Lütfen e-posta adresinize gönderdiğimiz aktivasyon linkine tıklayarak hesabınızı aktive ediniz.
+                Hesabınızı aktive etmeden not ekleyemez ve beğenme yapamazsınız.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+
+            $(function () {
+
+                $("footer").hide();
+
+                setTimeout(function () {
+
+                    window.location = "/Home/Index";
+                }, 3000);
+
+
+            });
+
+    </script>
